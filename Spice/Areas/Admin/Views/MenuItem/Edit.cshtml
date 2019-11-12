@@ -1,0 +1,149 @@
+﻿@model Spice.Models.ViewModels.MenuItemViewModel
+@using Spice.Extensions
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<h2 class="text-info">Edit Menu Item</h2>
+<br />
+
+<form method="post" asp-action="Create" enctype="multipart/form-data">
+    <div class="border background-white row"> 
+        <input type="hidden" asp-for="MenuItem.MenuItemId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <!--div for lhs-->
+
+        <div class="col-8">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.MenuItemName" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="MenuItem.MenuItemName" class="form-control" />
+                </div>
+                <span asp-validation-for="MenuItem.MenuItemName" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.Description" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    @Html.TextAreaFor(m => m.MenuItem.Description)
+                </div>
+                <span asp-validation-for="MenuItem.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.Price" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="MenuItem.Price" class="form-control" />
+                </div>
+                <span asp-validation-for="MenuItem.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.Image" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    <input type="file" name="files" multiple class="form-control" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.CategoryId" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    <select asp-for="@Model.MenuItem.CategoryId" id="CategoryId"
+                            asp-items="Model.Category.ToSelectListItem(Model.MenuItem.CategoryId)"
+                            class="form-control"></select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.SubCategoryId" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    <select asp-for="@Model.MenuItem.SubCategoryId" name="SubCategoryId" id="SubCategoryId"
+                            asp-items="@(new SelectList(string.Empty,"MenuItemId", "MenuItemName"))"
+                            class="form-control"></select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label asp-for="MenuItem.Spiciness" class="col-form-label"></label>
+                </div>
+                <div class="col-8">
+                    <select asp-for="MenuItem.Spiciness" asp-items="Html.GetEnumSelectList<MenuItem.ESpicy>()"
+                            class="form-control"></select>
+                </div>
+            </div>
+        </div>
+
+        <!--div for rhs-->
+
+        <div class="col-3 offset-1">
+            <p align="right"><button  onclick="ReplaceImage()" type="button" class="btn btn-danger text-white"><i class="fas fa-times-circle"></i></button></p>
+            <img src="@Model.MenuItem.Image" id="DisplayImage" style="border-radius:5px; border: 1px solid #bbb9b9" />
+        </div>
+        <div class="col-8">
+            <div class="col-8 offset-4">
+                <partial name="_EditAndBackButtonsPartialView" model="Model.MenuItem.MenuItemId"/>
+            </div>
+        </div>
+        
+    </div>
+</form>
+
+
+@section Scripts{
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugin: "lists",
+            menubar: 'file edit format'
+        })
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            getSubCategory();
+            $('#CategoryId').change(function () {
+                getSubCategory();
+            });
+        });
+
+
+        function getSubCategory() {
+            var url = '@Url.Content("~/")' + "Admin/SubCategory/GetSubCategory";
+            var ddlsoruce = '#CategoryId';
+            var subcategoryid = @Model.MenuItem.SubCategoryId;
+            $.getJSON(url, { id: $(ddlsoruce).val() }, function (data) {
+                var items = '';
+                $('#SubCategoryId').empty();
+                $.each(data, function (i, subcategory) {
+                    if (subcategoryid == subcategory.value) {
+                        items += "<option value='" + subcategory.value + "'selected>" + subcategory.text + "</option>";
+                    }
+                    else {
+                        items += "<option value='" + subcategory.value + "'>" + subcategory.text + "</option>";
+
+                    }
+                });
+                $('#SubCategoryId').html(items);
+            });
+        };
+
+        function ReplaceImage() {
+            var defaultImage = "@ViewBag.defaultImage";
+            document.getElementById("DisplayImage").src = defaultImage;
+        }
+
+    </script>
+
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

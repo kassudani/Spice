@@ -1,0 +1,26 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete Category</h2>
+<hr />
+
+<form method="post" asp-action="Delete">
+    <div class="border background-white">
+        <div class="text-danger"></div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="CategoryName" class="col-form-label"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="CategoryName" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="col-5 offset-2">
+            <partial name="_DeleteAndBackButtonsPartialView" model="Model.CategoryId"/>
+        </div>
+    </div>
+</form>
+
