@@ -42,6 +42,13 @@ namespace Spice
             services.AddControllersWithViews();
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
+            services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.IdleTimeout = TimeSpan.FromMinutes(5);
+                options.Cookie.HttpOnly = true;
+            });
+
             services.ConfigureApplicationCookie(options =>
 
             {
@@ -76,6 +83,7 @@ namespace Spice
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
